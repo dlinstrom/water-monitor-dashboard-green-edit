@@ -497,31 +497,11 @@
                     <div class="sensor-overlay-title">Sensor 2</div>
                     <div class="sensor-overlay-value" id="map-level-2">-- ft</div>
                 </div>
-            </div>
             
-            <!-- Simple text-based location info -->
-            <div style="margin-top: 15px; padding: 15px; background: #f0f9f0; border-radius: 8px;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center;">
-                    <div>
-                        <strong style="color: #4a7c28;">📍 Sensor 1</strong><br>
-                        <span style="color: #666; font-size: 12px;">35.2214°N, 120.5138°W</span><br>
-                        <span style="color: #2d5016; font-size: 18px; font-weight: bold;" id="text-level-1">-- ft</span>
-                    </div>
-                    <div>
-                        <strong style="color: #4a7c28;">📍 Sensor 2</strong><br>
-                        <span style="color: #666; font-size: 12px;">35.1916°N, 120.5119°W</span><br>
-                        <span style="color: #2d5016; font-size: 18px; font-weight: bold;" id="text-level-2">-- ft</span>
-                    </div>
-                </div>
-                <div style="text-align: center; margin-top: 10px; color: #666; font-size: 12px;">
-                    <a href="https://www.google.com/maps/search/?api=1&query=35.2214,-120.5138" 
-                       target="_blank" 
-                       style="color: #4a7c28; text-decoration: none; font-weight: bold;">
-                       View Morro Bay on Google Maps →
-                    </a>
-                </div>
-            </div>
-        </div>
+                <div class="map-container">
+  <h3>📍 Sensor Locations - Morro Bay, CA</h3>
+  <div id="gmap" style="height:400px;width:100%;border-radius:10px;border:2px solid #ddd;"></div>
+</div>
         
         <div class="message-log">
             <h3>Message Log</h3>
