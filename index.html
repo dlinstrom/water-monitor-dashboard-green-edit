@@ -358,46 +358,60 @@
     const BBOX={ // rough area bounds (W,E,S,N)
       w:-120.5350, e:-120.4900, s:35.1800, n:35.2400
     };
-    const SENSORS={
-      1:{name:'Sensor 1', lat:35.221400, lng:-120.513800},
-      2:{name:'Sensor 2', lat:35.191600, lng:-120.511900}
-    };
+    <script>
+  // Fixed sensor locations (your coordinates)
+  const SENSOR_LOCATIONS = {
+    "1": { name: "Sensor 1", lat: 35.221400, lng: -120.513800 },
+    "2": { name: "Sensor 2", lat: 35.191600, lng: -120.511900 }
+  };
 
-    function lonLatToXY(lng,lat, W=800, H=400){
-      const x=(lng-BBOX.w)/(BBOX.e-BBOX.w)*W;
-      const y=(1-(lat-BBOX.s)/(BBOX.n-BBOX.s))*H;
-      return {x,y};
+  let gmap;
+  const markers = {};
+  const infoWindows = {};
+
+  function infoHtml(id, name, valText) {
+    return `${name}<br>Level: <span id="lvl-${id}">${valText ?? '--'}</span> ft`;
+  }
+
+  // Google Maps callback
+  function initMap() {
+    const start = SENSOR_LOCATIONS["1"];
+    gmap = new google.maps.Map(document.getElementById("gmap"), {
+      center: { lat: start.lat, lng: start.lng },
+      zoom: 13,
+      mapTypeId: "terrain",
+    });
+
+    const bounds = new google.maps.LatLngBounds();
+
+    Object.entries(SENSOR_LOCATIONS).forEach(([id, loc]) => {
+      const m = new google.maps.Marker({
+        position: { lat: loc.lat, lng: loc.lng },
+        map: gmap,
+        title: loc.name,
+      });
+      const iw = new google.maps.InfoWindow({ content: infoHtml(id, loc.name) });
+      m.addListener("click", () => iw.open({ anchor: m, map: gmap }));
+      markers[id] = m;
+      infoWindows[id] = iw;
+      bounds.extend(m.getPosition());
+    });
+
+    if (Object.keys(SENSOR_LOCATIONS).length > 1) gmap.fitBounds(bounds, 50);
+  }
+
+  // Called from your existing sensor update code
+  window.updateMarkerLevel = function(sensorId, value) {
+    const valText = Number(value).toFixed(2);
+    const loc = SENSOR_LOCATIONS[sensorId];
+    if (infoWindows[sensorId] && loc) {
+      infoWindows[sensorId].setContent(infoHtml(sensorId, loc.name, valText));
     }
-    function setupMiniMap(){
-      // Place pins in SVG
-      const svg=document.getElementById('miniMapSvg');
-      const p1=lonLatToXY(SENSORS[1].lng,SENSORS[1].lat);
-      const p2=lonLatToXY(SENSORS[2].lng,SENSORS[2].lat);
-      const g1=svg.querySelector('#pin-1'), g2=svg.querySelector('#pin-2');
-      g1.setAttribute('transform',`translate(${p1.x},${p1.y})`);
-      g2.setAttribute('transform',`translate(${p2.x},${p2.y})`);
-
-      // Position overlays in the same relative spots
-      const wrap=document.getElementById('mapWrapper');
-      function placeOverlay(overlayEl, p){
-        const left=(p.x/800)*100, top=(p.y/400)*100;
-        overlayEl.style.left=left+'%';
-        overlayEl.style.top =top +'%';
-      }
-      placeOverlay(document.getElementById('overlay1'), p1);
-      placeOverlay(document.getElementById('overlay2'), p2);
-
-      // Build Google Maps links
-      const gm1=`https://www.google.com/maps/search/?api=1&query=${SENSORS[1].lat},${SENSORS[1].lng}`;
-      const gm2=`https://www.google.com/maps/search/?api=1&query=${SENSORS[2].lat},${SENSORS[2].lng}`;
-      const centerLat=((SENSORS[1].lat+SENSORS[2].lat)/2).toFixed(6);
-      const centerLng=((SENSORS[1].lng+SENSORS[2].lng)/2).toFixed(6);
-      const area=`https://www.google.com/maps/search/?api=1&query=${centerLat},${centerLng}`;
-
-      document.getElementById('gmaps1').href=gm1;
-      document.getElementById('gmaps2').href=gm2;
-      document.getElementById('gmapsArea').href=area;
+    if (markers[sensorId] && loc) {
+      markers[sensorId].setTitle(`${loc.name} — ${valText} ft`);
     }
-  </script>
+  };
+</script>
+
 </body>
 </html>
