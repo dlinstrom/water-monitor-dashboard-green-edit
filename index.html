@@ -535,10 +535,7 @@
             Total Readings: <span id="totalReadings">0</span>
         </div>
     </div>
-
-    <!-- MQTT Library from CDN -->
-    <script src="https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js"></script>
-    
+ 
     <script>
         // Global variables
         let client = null;
@@ -954,5 +951,35 @@
             console.error(message);
         }
     </script>
+    <script>
+(function loadMqtt() {
+  const loading = document.getElementById('loadingNotice');
+  const connectBtn = document.getElementById('connectBtn');
+
+  function onOK() {
+    if (loading) loading.style.display = 'none';
+    if (connectBtn) connectBtn.disabled = false;
+    console.log('mqtt.js loaded:', typeof mqtt);
+  }
+  function onFail2() {
+    console.error('Failed to load MQTT library from both CDNs.');
+    if (loading) loading.textContent = 'Failed to load MQTT library. Check your connection/ad blocker.';
+  }
+  function load(src, next) {
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.onload = onOK;
+    s.onerror = next || onFail2;
+    document.head.appendChild(s);
+  }
+  // Try unpkg, then jsDelivr as fallback
+  load('https://unpkg.com/mqtt@4.3.7/dist/mqtt.min.js', function() {
+    console.warn('unpkg failed; trying jsDelivr…');
+    load('https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js');
+  });
+})();
+</script>
+
 </body>
 </html>
